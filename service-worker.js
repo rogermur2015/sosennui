@@ -1,6 +1,6 @@
 // SOS Ennui — minimal cache-first service worker
 // Bumps CACHE_NAME whenever index.html content changes to force a refresh.
-const CACHE_NAME = "sos-ennui-v1";
+const CACHE_NAME = "sos-ennui-v2";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
