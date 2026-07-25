@@ -66,7 +66,7 @@
   header{
     max-width:1180px;
     margin:0 auto;
-    padding:56px 24px 30px;
+    padding:32px 24px 20px;
     text-align:center;
     position:relative;
   }
@@ -100,13 +100,20 @@
     margin-top:2px;
   }
   .tagline{
-    max-width:620px;
-    margin:22px auto 0;
-    font-size:17px;
-    line-height:1.55;
+    max-width:560px;
+    margin:12px auto 0;
+    font-size:14.5px;
+    line-height:1.45;
     color:rgba(244,242,234,0.78);
   }
   .tagline strong{color:var(--amber-2); font-weight:700;}
+
+  .last-updated{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    color:rgba(244,242,234,0.45);
+    margin-top:10px;
+  }
 
   /* ---------- mode toggle ---------- */
   .mode-toggle{
@@ -285,6 +292,35 @@
   }
   .activity-link:hover{filter:brightness(1.1);}
 
+  #leafletMap{
+    height:380px;
+    border-radius:16px;
+    overflow:hidden;
+    margin-bottom:20px;
+    border:1px solid var(--line);
+    background:var(--ink-2);
+  }
+  .leaflet-popup-content-wrapper{
+    background:var(--ink-2);
+    color:var(--paper);
+    border-radius:10px;
+  }
+  .leaflet-popup-tip{background:var(--ink-2);}
+  .leaflet-popup-content{font-family:'Work Sans', sans-serif; font-size:13px; line-height:1.4;}
+  .leaflet-popup-content b{font-family:'Anton', sans-serif; font-size:14px; font-weight:400;}
+  .leaflet-popup-content a{color:var(--amber-2);}
+  .rating-badge{
+    display:inline-block;
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink);
+    background:var(--amber-2);
+    padding:2px 8px;
+    border-radius:999px;
+    margin-left:8px;
+  }
+
   .empty-state{
     text-align:center;
     padding:60px 20px;
@@ -301,14 +337,20 @@
   }
 
   @media (max-width:640px){
-    header{padding:40px 18px 20px;}
+    header{padding:20px 16px 14px;}
     .persona-grid{grid-template-columns:repeat(auto-fill, minmax(150px,1fr));}
+    .logo{font-size:clamp(38px, 14vw, 80px) !important;}
+    .eyebrow{font-size:9.5px; margin-bottom:10px;}
+    .mode-toggle{margin-top:16px;}
+    .mode-toggle button{font-size:12.5px; padding:9px 10px;}
   }
 
   @media (prefers-reduced-motion: reduce){
     .marquee{animation:none;}
   }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 
@@ -329,16 +371,16 @@
 <header>
   <div class="eyebrow">Bored to death? Emergency contained.</div>
   <h1 class="logo">SOS ENNUI</h1>
-  <div class="logo-sub">MTL &amp; BEYOND — 1 TO 3 HOURS OUT</div>
+  <div class="logo-sub">MTL &amp; BEYOND — 1 TO 3 HRS</div>
   <p class="tagline">
-    We already dug through Ticketmaster, the Old Port site, Just For Laughs, Jazz Fest, TOHU, La Ronde, Tremblant, Ottawa Tourism, Québec City and more — so you land on named events with real dates, not a wall of links to click through yourself.
-    Pick a <strong>category</strong>, a <strong>persona</strong>, or one of <strong>10 touristic cities</strong> within a 1–3 hour drive — and the specific picks show up instantly.
+    Named events with real dates, across 10 nearby cities — pick a <strong>category</strong>, <strong>persona</strong>, or <strong>city</strong>.
   </p>
+  <div class="last-updated">Data last refreshed: <span id="lastUpdatedText"></span></div>
 
   <div class="mode-toggle">
-    <button id="btn-persona" class="active">Browse by Persona</button>
-    <button id="btn-category">Browse by Category</button>
-    <button id="btn-region">Browse by City</button>
+    <button id="btn-persona" class="active">Persona</button>
+    <button id="btn-category">Category</button>
+    <button id="btn-region">City</button>
   </div>
 </header>
 
@@ -364,6 +406,11 @@
     <div class="results-count" id="resultsCount"></div>
   </div>
   <div class="card-grid" id="cardGrid"></div>
+
+  <div id="mapWrap" style="display:none;">
+    <div id="leafletMap"></div>
+    <div class="card-grid" id="placesList"></div>
+  </div>
 </main>
 
 <footer>
@@ -373,6 +420,8 @@
 <script>
 /* ---------------- DATA ---------------- */
 
+const LAST_UPDATED = "July 24, 2026";
+
 const CATEGORIES = [
   {id:"music",       label:"Music, Tributes & Candlelight",      accent:"#f2a53d"},
   {id:"cine",        label:"Cinema with Orchestra",               accent:"#9b8cff"},
@@ -381,7 +430,8 @@ const CATEGORIES = [
   {id:"balloons",    label:"Montgolfières & Air Shows",            accent:"#2fc9b7"},
   {id:"foodfest",    label:"Food Festivals",                       accent:"#ff5c72"},
   {id:"ateliers",    label:"Food Ateliers & Cooking Classes",      accent:"#f2a53d"},
-  {id:"restaurants", label:"Trending Restaurants",                 accent:"#9b8cff"},
+  {id:"restaurants", label:"Restaurants (rated 4.2+)",           accent:"#9b8cff"},
+  {id:"coffee",      label:"Coffee Lovers (rated 4.2+)",          accent:"#c98a4b"},
   {id:"islands",     label:"Islands & Waterfront",                 accent:"#2fc9b7"},
   {id:"parks",       label:"Parks, Water Sports & Camping",        accent:"#2fc9b7"},
   {id:"biking",      label:"Biking & Trails",                      accent:"#f2a53d"},
@@ -389,6 +439,7 @@ const CATEGORIES = [
   {id:"shopping",    label:"Shopping",                             accent:"#ff5c72"},
   {id:"latin",       label:"Latin & Spanish Flavor",                accent:"#ff5c72"},
   {id:"bigfest",     label:"Comedy & Marquee Festivals",            accent:"#ffcf7a"},
+  {id:"experiences", label:"Experiences (rated 4.0+)",             accent:"#5fb8e0"},
 ];
 
 const REGIONS = [
@@ -405,15 +456,15 @@ const REGIONS = [
 ];
 
 const PERSONAS = [
-  {id:"romantic",  emoji:"💛", name:"The Romantic Couple",     blurb:"Candlelight, sunsets over the river, tasting menus.", cats:["music","cine","islands","restaurants","fireworks"]},
-  {id:"foodie",    emoji:"🍽️", name:"The Foodie",               blurb:"Food festivals, chef's-table ateliers, the newest openings.", cats:["foodfest","ateliers","restaurants","latin"]},
+  {id:"romantic",  emoji:"💛", name:"The Romantic Couple",     blurb:"Candlelight, sunsets over the river, tasting menus.", cats:["music","cine","islands","restaurants","coffee","fireworks"]},
+  {id:"foodie",    emoji:"🍽️", name:"The Foodie",               blurb:"Food festivals, chef's-table ateliers, the newest openings.", cats:["foodfest","ateliers","restaurants","coffee","latin"]},
   {id:"corazon",   emoji:"💃", name:"Corazón Latino",           blurb:"Salsa nights, Latin fests, Spanish-language singers.", cats:["latin","music","foodfest","bigfest"]},
   {id:"outdoorsy", emoji:"🌲", name:"The Outdoor Adventurer",   blurb:"Trails, paddling, camping, fresh air over city lights.", cats:["parks","biking","islands","winter"]},
   {id:"winter",    emoji:"⛷️", name:"The Winter Warrior",       blurb:"Skating rinks, ski hills, snow festivals.", cats:["winter","parks","fireworks"]},
   {id:"musichead", emoji:"🎻", name:"The Music Lover",          blurb:"Tribute nights, orchestras, jazz, live everything.", cats:["music","cine","bigfest","latin"]},
-  {id:"festival",  emoji:"🎪", name:"The Festival Chaser",      blurb:"Circus tents, fireworks, comedy, big summer energy.", cats:["bigfest","fireworks","circus","foodfest"]},
-  {id:"shopper",   emoji:"🛍️", name:"The Shopper",              blurb:"Malls, outlets, the underground city, browsing therapy.", cats:["shopping","restaurants"]},
-  {id:"familyplus",emoji:"👨‍👩‍👧", name:"Family (with Adult Kids)",blurb:"Something for everyone, no one bored, no one babied.", cats:["islands","foodfest","bigfest","biking","circus"]},
+  {id:"festival",  emoji:"🎪", name:"The Festival Chaser",      blurb:"Circus tents, fireworks, comedy, big summer energy.", cats:["bigfest","fireworks","circus","foodfest","experiences"]},
+  {id:"shopper",   emoji:"🛍️", name:"The Shopper",              blurb:"Malls, outlets, the underground city, browsing therapy.", cats:["shopping","restaurants","coffee"]},
+  {id:"familyplus",emoji:"👨‍👩‍👧", name:"Family (with Adult Kids)",blurb:"Something for everyone, no one bored, no one babied.", cats:["islands","foodfest","bigfest","biking","circus","experiences"]},
   {id:"culture",   emoji:"🎭", name:"The Culture Seeker",       blurb:"Circus arts, film scores live, world music, big ideas.", cats:["circus","cine","music","bigfest"]},
 ];
 
@@ -467,12 +518,8 @@ const ACTIVITIES = [
   {name:"Atelier de Cuisine Table Rouge", cat:"ateliers", loc:"Pierrefonds-Roxboro", desc:"Pasta, sushi and team-building classes in a clean, modern kitchen — kids' culinary workshops too.", url:"https://www.restomontreal.ca/resto/atelier-de-cuisine-table-rouge/11407/en/", region:"montreal"},
   {name:"Time Out Market Cooking School", cat:"ateliers", loc:"Time Out Market Montréal", desc:"Seasonal Ateliers & Saveurs classes inside the market — start with chocolate truffles, finish grilling picanha.", url:"https://www.timeout.com/montreal/news/i-tried-a-new-montreal-cooking-class-at-ateliers-saveurs-and-it-was-a-delicious-game-changer-070925", region:"montreal"},
 
-  // ===== TRENDING RESTAURANTS — sourced from restomontreal.ca, tastet.ca =====
-  {name:"Ferreira Café", cat:"restaurants", loc:"Golden Square Mile, Downtown", desc:"An institution for Portuguese seafood — blackened cod, octopus, bouillabaisse — in a vibrant, energetic room.", url:"https://www.restomontreal.ca/resto/ferreira-cafe-montreal/739/en/", region:"montreal"},
-  {name:"Sabayon", cat:"restaurants", loc:"Pointe-Saint-Charles", desc:"Patrice Demers and Marie-Josée Beaudoin's intimate Québécois tasting menu, known for its harmonious wine and tea pairings.", url:"https://www.restomontreal.ca/resto/sabayon-montreal/17526/en/", region:"montreal"},
-  {name:"Osteria MKT", cat:"restaurants", loc:"Downtown", desc:"Italian dishes — carpaccio, house pasta — in a striking historic downtown venue with free underground parking.", url:"https://www.restomontreal.ca/resto/osteria-mkt-montreal/9284/en/", region:"montreal"},
-  {name:"Petros Laurier", cat:"restaurants", loc:"Mile-End", desc:"Grilled fish, lamb chops and a lively Greek-taverna atmosphere that regulars call a true Mediterranean escape.", url:"https://www.restomontreal.ca/resto/petros-laurier-montreal/13268/en/", region:"montreal"},
-  {name:"Mon Lapin", cat:"restaurants", loc:"Little Italy", desc:"Ranked 5th in Canada's 50 Best North America 2026 — one of 14 Canadian restaurants on the list, most from Québec.", url:"https://tastet.ca/en/", region:"montreal"},
+  // (Restaurants moved to the PLACES dataset below — now rated & mapped instead of editorial picks)
+
 
   // ===== ISLANDS & WATERFRONT — sourced from oldportofmontreal.com, mtl.org, parcjeandrapeau.com =====
   {name:"La Grande Roue de Montréal", cat:"islands", loc:"Old Port — 60m Ferris wheel", desc:"Heated, air-conditioned gondolas offering panoramic views from downtown to Habitat 67 and Île Sainte-Hélène.", url:"https://www.mtl.org/en/experience/activities-big-top", region:"montreal"},
@@ -578,6 +625,39 @@ const ACTIVITIES = [
   {name:"Church Street Marketplace Shopping", cat:"shopping", loc:"Downtown Burlington", desc:"A walkable, car-free shopping strip of boutiques, galleries and restaurants — plus regular Party on the Bricks street events in summer.", url:"https://churchstmarketplace.com/annual-events", region:"burlington"},
 ];
 
+/* ---------------- PLACES (rated venues: coffee, restaurants, experiences) ---------------- */
+/* Ratings are aggregated from public rankings/review sites (Yelp, Tripadvisor, World's 100 Best,
+   restaurant guides) rather than a live Google Places API pull — treat as a strong starting point
+   and confirm current rating/hours on Google Maps before you go. Coordinates are exact where a
+   confirmed street address was found; otherwise neighbourhood-level approximate. */
+
+const PLACES = [
+  // ===== COFFEE — Montréal — sourced from rank10.ca, Yelp, EZPZ Coffee, MTL Blog =====
+  {name:"Café Olimpico", cat:"coffee", region:"montreal", address:"124 Rue Saint-Viateur O, Montréal (Mile End)", rating:4.5, lat:45.5227, lng:-73.6013, url:"https://www.google.com/maps/search/?api=1&query=Caf%C3%A9+Olimpico+Montreal", desc:"Montréal institution since 1970 — standing-room espresso counter, old-world Italian atmosphere, lines every morning."},
+  {name:"Crew Collective & Café", cat:"coffee", region:"montreal", address:"360 Rue Saint-Jacques, Montréal (Old Montréal)", rating:4.5, lat:45.5023, lng:-73.5601, url:"https://www.crewcollectivecafe.com/", desc:"Coffee inside the former Royal Bank headquarters — 30-foot Beaux-Arts ceilings, marble and brass."},
+  {name:"Café Myriade", cat:"coffee", region:"montreal", address:"1432 Rue Mackay, Montréal (Downtown)", rating:4.6, lat:45.4967, lng:-73.5789, url:"https://www.google.com/maps/search/?api=1&query=Caf%C3%A9+Myriade+Montreal", desc:"Widely considered the most technically respected specialty coffee bar in the city."},
+  {name:"Café Pista", cat:"coffee", region:"montreal", address:"6524 Boulevard Saint-Laurent, Montréal (Mile End)", rating:4.7, lat:45.5330, lng:-73.6120, url:"https://www.google.com/maps/search/?api=1&query=Caf%C3%A9+Pista+Montreal", desc:"Ranked #34 in the World's 100 Best Coffee Shops 2026 — the highest-ranked café in all of Canada."},
+  {name:"CAFÉ KRÉMA", cat:"coffee", region:"montreal", address:"Ville-Marie, Montréal", rating:4.8, lat:45.5017, lng:-73.5673, url:"https://www.google.com/maps/search/?api=1&query=Cafe+Krema+Montreal", desc:"Chocolate croissants, cannolis and espresso — one of Yelp's top-rated coffee spots in the city."},
+  {name:"Happy Goat Coffee Company", cat:"coffee", region:"ottawa", address:"Ottawa, ON", rating:4.5, lat:45.4215, lng:-75.6972, url:"https://www.google.com/maps/search/?api=1&query=Happy+Goat+Coffee+Company+Ottawa", desc:"One of Ottawa's most consistently top-ranked independent roasters and cafés."},
+  {name:"Little Victories Coffee Roasters", cat:"coffee", region:"ottawa", address:"Ottawa, ON", rating:4.5, lat:45.4112, lng:-75.6981, url:"https://www.google.com/maps/search/?api=1&query=Little+Victories+Coffee+Roasters+Ottawa", desc:"A local roaster and café favourite, popular with Ottawa's specialty coffee crowd."},
+  {name:"Café Smith", cat:"coffee", region:"quebec-city", address:"Place Royale, Québec City", rating:4.4, lat:46.8129, lng:-71.2038, url:"https://www.google.com/maps/search/?api=1&query=Cafe+Smith+Place+Royale+Quebec", desc:"A well-loved café right on the city's cutest square, inside a beautifully restored building."},
+
+  // ===== RESTAURANTS (rated 4.2+) — Montréal — sourced from Tripadvisor, Yelp, Michelin Guide, RestoMontreal =====
+  {name:"Ferreira Café", cat:"restaurants", region:"montreal", address:"1446 Rue Peel, Montréal, QC H3A 1S8", rating:4.3, lat:45.4977, lng:-73.5769, url:"https://www.restomontreal.ca/resto/ferreira-cafe-montreal/739/en/", desc:"Portuguese seafood institution since 1996 — blackened cod, grilled octopus, seafood rice. Michelin Guide selection."},
+  {name:"Mon Lapin", cat:"restaurants", region:"montreal", address:"150 Rue Saint-Zotique E, Montréal, QC", rating:4.5, lat:45.5330, lng:-73.6106, url:"https://vinmonlapin.com/", desc:"French wine bar & restaurant ranked 5th in Canada's 50 Best North America 2026. Michelin Guide 'Recommended'."},
+  {name:"Sabayon", cat:"restaurants", region:"montreal", address:"Pointe-Saint-Charles, Montréal", rating:4.6, lat:45.4740, lng:-73.5760, url:"https://www.restomontreal.ca/resto/sabayon-montreal/17526/en/", desc:"Patrice Demers and Marie-Josée Beaudoin's intimate Québécois tasting menu, known for wine and tea pairings."},
+  {name:"Osteria MKT", cat:"restaurants", region:"montreal", address:"Downtown Montréal", rating:4.4, lat:45.5017, lng:-73.5673, url:"https://www.restomontreal.ca/resto/osteria-mkt-montreal/9284/en/", desc:"Italian dishes — carpaccio, house pasta — in a striking historic downtown venue."},
+  {name:"Petros Laurier", cat:"restaurants", region:"montreal", address:"Mile-End, Montréal", rating:4.3, lat:45.5227, lng:-73.5957, url:"https://www.restomontreal.ca/resto/petros-laurier-montreal/13268/en/", desc:"Grilled fish, lamb chops and a lively Greek-taverna atmosphere."},
+
+  // ===== EXPERIENCES (rated 4.0+) — Montréal — escape rooms, arcades, indoor golf, casino =====
+  {name:"Casino de Montréal", cat:"experiences", region:"montreal", address:"1 Avenue du Casino, Montréal, QC H3C 4W7", rating:4.2, lat:45.5055, lng:-73.5260, url:"https://casinos.lotoquebec.com/en/montreal/home", desc:"The largest casino in Canada — gaming floors, shows and restaurants on Notre-Dame Island."},
+  {name:"BoulZeye", cat:"experiences", region:"montreal", address:"3655 Bd du Tricentenaire, Montréal, QC H1B 5X4", rating:4.3, lat:45.6580, lng:-73.5100, url:"https://www.escapology.com/en/montreal-canada", desc:"16 bowling lanes, Québec's largest two-floor laser tag, 4 escape rooms and a 35-arcade VR zone under one roof."},
+  {name:"Échappe-toi Montréal", cat:"experiences", region:"montreal", address:"Montréal, QC", rating:4.7, lat:45.5227, lng:-73.5850, url:"https://www.mtl.org/en/experience/escape-game-in-montreal", desc:"Québec's first escape game centre (since 2014) — original scenarios rooted in local history and culture."},
+  {name:"Golf 1600", cat:"experiences", region:"montreal", address:"Montréal, QC", rating:4.6, lat:45.4950, lng:-73.5700, url:"https://www.golf1600.com/", desc:"Private indoor golf club with 4 TrackMan/Foresight simulators in a 3,000 sq ft space."},
+  {name:"Muni Golf Intérieur", cat:"experiences", region:"montreal", address:"Montréal, QC", rating:4.5, lat:45.5100, lng:-73.5750, url:"https://www.muni.golf/en/golf-interieur", desc:"Golfzon simulators with a hydraulic tilting floor and auto-tee system — a modern golf club reimagined indoors."},
+  {name:"Jigsaw Escape Rooms Ottawa", cat:"experiences", region:"ottawa", address:"12 ByWard Market Square, Ottawa, ON", rating:4.6, lat:45.4285, lng:-75.6919, url:"https://jigsawescape.com/ottawa/", desc:"10 themed escape rooms in the heart of ByWard Market — beginner-friendly and highly rated."},
+];
+
 /* ---------------- STATE & RENDER ---------------- */
 
 let mode = "persona"; // "persona" | "category" | "region"
@@ -587,6 +667,14 @@ let activeRegion = null;
 
 const catById = id => CATEGORIES.find(c=>c.id===id);
 const regionById = id => REGIONS.find(r=>r.id===id);
+
+const MAP_CATEGORIES = ["coffee","restaurants","experiences"];
+let mapInstance = null;
+
+function placeToCard(p){
+  return {name:p.name, cat:p.cat, loc:p.address, desc:`⭐ ${p.rating.toFixed(1)} · ${p.desc}`, url:p.url, region:p.region};
+}
+const ALL_CARDS = ACTIVITIES.concat(PLACES.map(placeToCard));
 
 function renderPersonas(){
   const grid = document.getElementById("personaGrid");
@@ -626,24 +714,92 @@ function renderRegionChips(){
   });
 }
 
-function renderCards(){
-  const grid = document.getElementById("cardGrid");
+function renderPlacesMapView(cat){
+  const c = catById(cat);
   const title = document.getElementById("resultsTitle");
   const count = document.getElementById("resultsCount");
+  const listEl = document.getElementById("placesList");
+  const mapEl = document.getElementById("leafletMap");
+
+  const places = PLACES.filter(p=>p.cat===cat);
+  title.textContent = c.label;
+  count.textContent = `${places.length} place${places.length===1?"":"s"}`;
+
+  // (Re)initialize the Leaflet map fresh each time this view is entered
+  if(mapInstance){ mapInstance.remove(); mapInstance = null; }
+  mapEl.innerHTML = "";
+
+  if(places.length===0){
+    listEl.innerHTML = `<div class="empty-state">Nothing here yet.</div>`;
+    return;
+  }
+
+  mapInstance = L.map(mapEl, {scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 18
+  }).addTo(mapInstance);
+
+  const markers = [];
+  places.forEach(p=>{
+    const marker = L.marker([p.lat, p.lng]).addTo(mapInstance);
+    marker.bindPopup(`<b>${p.name}</b><br>⭐ ${p.rating.toFixed(1)}<br>${p.address}<br><a href="${p.url}" target="_blank" rel="noopener">Visit →</a>`);
+    markers.push(marker);
+  });
+  const group = L.featureGroup(markers);
+  mapInstance.fitBounds(group.getBounds().pad(0.2));
+
+  listEl.innerHTML = "";
+  places
+    .slice()
+    .sort((a,b)=> b.rating - a.rating)
+    .forEach(p=>{
+      const card = document.createElement("div");
+      card.className = "activity-card";
+      card.style.setProperty("--card-accent", c.accent);
+      card.innerHTML = `
+        <div class="activity-cat-tag">${regionById(p.region) ? regionById(p.region).label : ""}<span class="rating-badge">★ ${p.rating.toFixed(1)}</span></div>
+        <div class="activity-name">${p.name}</div>
+        <div class="activity-desc">${p.desc}</div>
+        <div class="activity-meta">
+          <span class="activity-loc">${p.address}</span>
+          <a class="activity-link" href="${p.url}" target="_blank" rel="noopener">Visit / directions →</a>
+        </div>
+      `;
+      listEl.appendChild(card);
+    });
+}
+
+function renderCards(){
+  const grid = document.getElementById("cardGrid");
+  const mapWrap = document.getElementById("mapWrap");
+  const title = document.getElementById("resultsTitle");
+  const count = document.getElementById("resultsCount");
+
+  if(mode==="category" && activeCategory && MAP_CATEGORIES.includes(activeCategory)){
+    grid.style.display = "none";
+    mapWrap.style.display = "";
+    renderPlacesMapView(activeCategory);
+    return;
+  }
+  grid.style.display = "";
+  mapWrap.style.display = "none";
+  if(mapInstance){ mapInstance.remove(); mapInstance = null; }
+
   grid.innerHTML = "";
 
-  let list = ACTIVITIES;
+  let list = ALL_CARDS;
   let heading = "Everything, everywhere";
 
   if(mode==="persona" && activePersona){
     const p = PERSONAS.find(x=>x.id===activePersona);
-    list = ACTIVITIES.filter(a=>p.cats.includes(a.cat));
+    list = ALL_CARDS.filter(a=>p.cats.includes(a.cat));
     heading = `For ${p.name}`;
   } else if(mode==="category" && activeCategory){
     list = ACTIVITIES.filter(a=>a.cat===activeCategory);
     heading = catById(activeCategory).label;
   } else if(mode==="region" && activeRegion){
-    list = ACTIVITIES.filter(a=>a.region===activeRegion);
+    list = ALL_CARDS.filter(a=>a.region===activeRegion);
     heading = regionById(activeRegion).label;
   }
 
@@ -697,6 +853,8 @@ function setMode(newMode){
 document.getElementById("btn-persona").onclick = ()=> setMode("persona");
 document.getElementById("btn-category").onclick = ()=> setMode("category");
 document.getElementById("btn-region").onclick = ()=> setMode("region");
+
+document.getElementById("lastUpdatedText").textContent = LAST_UPDATED;
 
 renderAll();
 

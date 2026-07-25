@@ -1,6 +1,4 @@
-// SOS Ennui — minimal cache-first service worker
-// Bumps CACHE_NAME whenever index.html content changes to force a refresh.
-const CACHE_NAME = "sos-ennui-v2";
+const CACHE_NAME = "sos-ennui-v3";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
@@ -27,11 +25,8 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Network-first for navigation requests (so a fresh deploy updates instantly when online),
-// falling back to cache when offline. Cache-first for static assets.
 self.addEventListener("fetch", (event) => {
   const { request } = event;
-
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -44,7 +39,6 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
-
   event.respondWith(
     caches.match(request).then((cached) => {
       return (
