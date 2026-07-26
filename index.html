@@ -162,23 +162,31 @@
   }
   .section-label::after{content:""; flex:1; height:1px; background:var(--line);}
 
-  #mainContent.persona-mode{
+  #mainContent{
     display:flex;
     gap:28px;
     align-items:flex-start;
   }
-  #mainContent.persona-mode #persona-section{
+  #persona-section{
     flex:0 0 190px;
     position:sticky;
     top:16px;
+    order:0;
   }
-  #mainContent.persona-mode #resultsArea{
+  #category-section, #region-section{
+    flex:0 0 230px;
+    position:sticky;
+    top:16px;
+    order:2;
+  }
+  #resultsArea{
     flex:1;
     min-width:0;
+    order:1;
   }
   @media (max-width:900px){
-    #mainContent.persona-mode{flex-direction:column;}
-    #mainContent.persona-mode #persona-section{position:static; width:100%; flex:none;}
+    #mainContent{flex-direction:column;}
+    #persona-section, #category-section, #region-section{position:static; width:100%; flex:none;}
   }
 
   .persona-sidebar{
@@ -235,17 +243,16 @@
 
   /* ---------- category chip grid ---------- */
   .chip-grid{
-
     display:flex;
-    flex-wrap:wrap;
-    gap:10px;
+    flex-direction:column;
+    gap:6px;
     margin-bottom:8px;
   }
   .chip{
     border:1px solid var(--line);
-    border-radius:999px;
-    padding:10px 18px;
-    font-size:13.5px;
+    border-radius:10px;
+    padding:9px 12px;
+    font-size:12.5px;
     font-weight:600;
     background:rgba(255,255,255,0.03);
     cursor:pointer;
@@ -254,7 +261,9 @@
     align-items:center;
     gap:8px;
     transition:all .18s ease;
-    white-space:nowrap;
+    white-space:normal;
+    line-height:1.3;
+    text-align:left;
   }
   .chip:hover{border-color:rgba(244,242,234,0.4);}
   .chip.active{
@@ -432,7 +441,7 @@
   </div>
 </header>
 
-<main id="mainContent" class="persona-mode">
+<main id="mainContent">
 
   <section id="persona-section">
     <div class="persona-sidebar">
@@ -449,6 +458,7 @@
 
   <section id="region-section" style="display:none;">
     <div class="section-label">Pick a city</div>
+    <button id="regionMapToggle" class="map-toggle-btn">🗺️ Show Map View</button>
     <div class="chip-grid" id="regionChips"></div>
   </section>
 
@@ -483,8 +493,8 @@ const CATEGORIES = [
   {id:"balloons",    label:"Montgolfières & Air Shows",            accent:"#2fc9b7"},
   {id:"foodfest",    label:"Food Festivals",                       accent:"#ff5c72"},
   {id:"ateliers",    label:"Food Ateliers & Cooking Classes",      accent:"#f2a53d"},
-  {id:"restaurants", label:"Restaurants (rated 4.2+)",           accent:"#9b8cff"},
-  {id:"coffee",      label:"Coffee Lovers (rated 4.2+)",          accent:"#c98a4b"},
+  {id:"restaurants", label:"Restaurants (rated 4.0+)",           accent:"#9b8cff"},
+  {id:"coffee",      label:"Coffee Lovers (rated 4.0+)",          accent:"#c98a4b"},
   {id:"islands",     label:"Islands & Waterfront",                 accent:"#2fc9b7"},
   {id:"parks",       label:"Parks, Water Sports & Camping",        accent:"#2fc9b7"},
   {id:"biking",      label:"Biking & Trails",                      accent:"#f2a53d"},
@@ -695,7 +705,7 @@ const PLACES = [
   {name:"Little Victories Coffee Roasters", cat:"coffee", region:"ottawa", address:"Ottawa, ON", rating:4.5, lat:45.4112, lng:-75.6981, url:"https://www.google.com/maps/search/?api=1&query=Little+Victories+Coffee+Roasters+Ottawa", desc:"A local roaster and café favourite, popular with Ottawa's specialty coffee crowd."},
   {name:"Café Smith", cat:"coffee", region:"quebec-city", address:"Place Royale, Québec City", rating:4.4, lat:46.8129, lng:-71.2038, url:"https://www.google.com/maps/search/?api=1&query=Cafe+Smith+Place+Royale+Quebec", desc:"A well-loved café right on the city's cutest square, inside a beautifully restored building."},
 
-  // ===== RESTAURANTS (rated 4.2+) — Montréal — sourced from Tripadvisor, Yelp, Michelin Guide, RestoMontreal =====
+  // ===== RESTAURANTS (rated 4.0+) — Montréal — sourced from Tripadvisor, Yelp, Michelin Guide, RestoMontreal =====
   {name:"Ferreira Café", cat:"restaurants", region:"montreal", address:"1446 Rue Peel, Montréal, QC H3A 1S8", rating:4.3, lat:45.4977, lng:-73.5769, url:"https://www.restomontreal.ca/resto/ferreira-cafe-montreal/739/en/", desc:"Portuguese seafood institution since 1996 — blackened cod, grilled octopus, seafood rice. Michelin Guide selection."},
   {name:"Mon Lapin", cat:"restaurants", region:"montreal", address:"150 Rue Saint-Zotique E, Montréal, QC", rating:4.5, lat:45.5330, lng:-73.6106, url:"https://vinmonlapin.com/", desc:"French wine bar & restaurant ranked 5th in Canada's 50 Best North America 2026. Michelin Guide 'Recommended'."},
   {name:"Sabayon", cat:"restaurants", region:"montreal", address:"Pointe-Saint-Charles, Montréal", rating:4.6, lat:45.4740, lng:-73.5760, url:"https://www.restomontreal.ca/resto/sabayon-montreal/17526/en/", desc:"Patrice Demers and Marie-Josée Beaudoin's intimate Québécois tasting menu, known for wine and tea pairings."},
@@ -709,6 +719,15 @@ const PLACES = [
   {name:"Golf 1600", cat:"experiences", region:"montreal", address:"Montréal, QC", rating:4.6, lat:45.4950, lng:-73.5700, url:"https://www.golf1600.com/", desc:"Private indoor golf club with 4 TrackMan/Foresight simulators in a 3,000 sq ft space."},
   {name:"Muni Golf Intérieur", cat:"experiences", region:"montreal", address:"Montréal, QC", rating:4.5, lat:45.5100, lng:-73.5750, url:"https://www.muni.golf/en/golf-interieur", desc:"Golfzon simulators with a hydraulic tilting floor and auto-tee system — a modern golf club reimagined indoors."},
   {name:"Jigsaw Escape Rooms Ottawa", cat:"experiences", region:"ottawa", address:"12 ByWard Market Square, Ottawa, ON", rating:4.6, lat:45.4285, lng:-75.6919, url:"https://jigsawescape.com/ottawa/", desc:"10 themed escape rooms in the heart of ByWard Market — beginner-friendly and highly rated."},
+
+  // ===== NEWER ADDITIONS — Ottawa, Québec City, Tremblant, Saint-Jean-sur-Richelieu =====
+  {name:"Supply and Demand", cat:"restaurants", region:"ottawa", address:"Wellington St W, Ottawa, ON", rating:4.8, lat:45.3985, lng:-75.7460, url:"https://www.google.com/maps/search/?api=1&query=Supply+and+Demand+Wellington+West+Ottawa", desc:"Seafood and pasta — one of Ottawa's most consistently highest-rated restaurants."},
+  {name:"Bâton Rouge Grillhouse", cat:"restaurants", region:"ottawa", address:"Albert St, Ottawa, ON", rating:4.4, lat:45.4187, lng:-75.7040, url:"https://www.google.com/maps/search/?api=1&query=Baton+Rouge+Grillhouse+Albert+St+Ottawa", desc:"Downtown grillhouse known for BBQ ribs, steaks and generous portions."},
+  {name:"Le Clan", cat:"restaurants", region:"quebec-city", address:"Québec City, QC", rating:4.6, lat:46.8123, lng:-71.2145, url:"https://www.google.com/maps/search/?api=1&query=Restaurant+Le+Clan+Quebec+City", desc:"Michelin-starred dining room from chef Stéphane Modat — consistently ranked at the top of Québec City's culinary scene."},
+  {name:"Ouroboros", cat:"restaurants", region:"quebec-city", address:"Rue Saint-Joseph, Saint-Roch, Québec City", rating:4.5, lat:46.8145, lng:-71.2265, url:"https://www.google.com/maps/search/?api=1&query=Ouroboros+Restaurant+Quebec+City", desc:"Market-driven, seasonal cooking — awarded a Michelin Bib Gourmand in both 2025 and 2026."},
+  {name:"Mission Liberté Escape Rooms", cat:"experiences", region:"tremblant", address:"Place Saint-Bernard, Mont-Tremblant", rating:4.5, lat:46.1184, lng:-74.5964, url:"https://www.tremblant.ca/things-to-do/activities/mission-liberte-escape-rooms", desc:"Six one-hour and three 30-minute escape scenarios right in the pedestrian village."},
+  {name:"Casino de Mont-Tremblant", cat:"experiences", region:"tremblant", address:"Mont-Tremblant, QC", rating:4.2, lat:46.1230, lng:-74.5930, url:"https://casinos.lotoquebec.com/en/mont-tremblant/home", desc:"A smaller Loto-Québec casino a few minutes from the resort village."},
+  {name:"Action 500", cat:"experiences", region:"saint-jean", address:"Saint-Jean-sur-Richelieu, QC", rating:4.5, lat:45.3067, lng:-73.2620, url:"https://www.google.com/maps/search/?api=1&query=Action+500+Saint-Jean-sur-Richelieu", desc:"Go-karts, laser tag and arcade all under one roof — a popular family stop near the balloon festival grounds."},
 ];
 
 /* ---------------- STATE & RENDER ---------------- */
@@ -717,7 +736,7 @@ let mode = "persona"; // "persona" | "category" | "region"
 let activePersona = null;
 let activeCategory = null;
 let activeRegion = null;
-let showMapView = false; // persona-mode map/list toggle
+let showMapView = false; // map/list toggle, shared by Persona and City modes
 
 const catById = id => CATEGORIES.find(c=>c.id===id);
 const regionById = id => REGIONS.find(r=>r.id===id);
@@ -929,11 +948,11 @@ function renderCards(){
   title.textContent = heading;
   count.textContent = `${list.length} experience${list.length===1?"":"s"}`;
 
-  // Persona-mode map toggle: same filtered list, plotted on a map instead of a plain grid
-  if(mode==="persona" && showMapView){
+  // Map toggle (Persona and City modes): same filtered list, plotted on a map instead of a plain grid
+  if((mode==="persona" || mode==="region") && showMapView){
     grid.style.display = "none";
     mapWrap.style.display = "";
-    renderGenericMapView(list, "Nothing here yet — pick another persona.");
+    renderGenericMapView(list, "Nothing here yet — pick another option.");
     return;
   }
 
@@ -973,6 +992,15 @@ function renderAll(){
   renderCards();
 }
 
+function resetMapToggle(){
+  showMapView = false;
+  ["personaMapToggle","regionMapToggle"].forEach(id=>{
+    const btn = document.getElementById(id);
+    btn.classList.remove("active");
+    btn.textContent = "🗺️ Show Map View";
+  });
+}
+
 function setMode(newMode){
   mode = newMode;
   document.getElementById("btn-persona").classList.toggle("active", newMode==="persona");
@@ -981,15 +1009,10 @@ function setMode(newMode){
   document.getElementById("persona-section").style.display = newMode==="persona" ? "" : "none";
   document.getElementById("category-section").style.display = newMode==="category" ? "" : "none";
   document.getElementById("region-section").style.display = newMode==="region" ? "" : "none";
-  document.getElementById("mainContent").classList.toggle("persona-mode", newMode==="persona");
   if(newMode!=="persona") activePersona = null;
   if(newMode!=="category") activeCategory = null;
   if(newMode!=="region") activeRegion = null;
-  if(newMode!=="persona"){
-    showMapView = false;
-    document.getElementById("personaMapToggle").classList.remove("active");
-    document.getElementById("personaMapToggle").textContent = "🗺️ Show Map View";
-  }
+  resetMapToggle();
   renderAll();
 }
 
@@ -997,13 +1020,17 @@ document.getElementById("btn-persona").onclick = ()=> setMode("persona");
 document.getElementById("btn-category").onclick = ()=> setMode("category");
 document.getElementById("btn-region").onclick = ()=> setMode("region");
 
-document.getElementById("personaMapToggle").onclick = ()=>{
-  showMapView = !showMapView;
-  const btn = document.getElementById("personaMapToggle");
-  btn.classList.toggle("active", showMapView);
-  btn.textContent = showMapView ? "📋 Show List View" : "🗺️ Show Map View";
-  renderCards();
-};
+function wireMapToggle(id){
+  document.getElementById(id).onclick = ()=>{
+    showMapView = !showMapView;
+    const btn = document.getElementById(id);
+    btn.classList.toggle("active", showMapView);
+    btn.textContent = showMapView ? "📋 Show List View" : "🗺️ Show Map View";
+    renderCards();
+  };
+}
+wireMapToggle("personaMapToggle");
+wireMapToggle("regionMapToggle");
 
 document.getElementById("lastUpdatedText").textContent = LAST_UPDATED;
 
