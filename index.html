@@ -162,32 +162,82 @@
   }
   .section-label::after{content:""; flex:1; height:1px; background:var(--line);}
 
-  .persona-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(215px, 1fr));
-    gap:14px;
+  #mainContent.persona-mode{
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+  }
+  #mainContent.persona-mode #persona-section{
+    flex:0 0 240px;
+    position:sticky;
+    top:16px;
+  }
+  #mainContent.persona-mode #resultsArea{
+    flex:1;
+    min-width:0;
+  }
+  @media (max-width:900px){
+    #mainContent.persona-mode{flex-direction:column;}
+    #mainContent.persona-mode #persona-section{position:static; width:100%; flex:none;}
+  }
+
+  .persona-sidebar{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .map-toggle-btn{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    background:rgba(255,255,255,0.03);
+    color:var(--paper);
+    font-family:'Work Sans', sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    cursor:pointer;
+    text-align:left;
+    transition:all .18s ease;
+    margin-bottom:4px;
+  }
+  .map-toggle-btn:hover{border-color:rgba(244,242,234,0.4);}
+  .map-toggle-btn.active{
+    background:linear-gradient(100deg, var(--teal), var(--violet));
+    border-color:transparent;
+    color:var(--ink);
+  }
+
+  .persona-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
     margin-bottom:8px;
   }
   .persona-card{
     border:1px solid var(--line);
-    border-radius:18px;
-    padding:20px 18px;
+    border-radius:16px;
+    padding:14px 16px;
     background:rgba(255,255,255,0.03);
     cursor:pointer;
     transition:transform .18s ease, border-color .18s ease, background .18s ease;
     text-align:left;
+    display:flex;
+    align-items:center;
+    gap:12px;
   }
-  .persona-card:hover{transform:translateY(-3px); border-color:rgba(244,242,234,0.35);}
+  .persona-card:hover{transform:translateX(3px); border-color:rgba(244,242,234,0.35);}
   .persona-card.active{
     background:linear-gradient(160deg, rgba(242,165,61,0.18), rgba(255,92,114,0.14));
     border-color:var(--amber-2);
   }
-  .persona-emoji{font-size:28px; display:block; margin-bottom:10px;}
-  .persona-name{font-weight:800; font-size:16px; margin-bottom:6px;}
-  .persona-blurb{font-size:13px; color:rgba(244,242,234,0.65); line-height:1.4;}
+  .persona-emoji{font-size:22px; flex-shrink:0;}
+  .persona-text{min-width:0;}
+  .persona-name{font-weight:800; font-size:14px; margin-bottom:2px;}
+  .persona-blurb{font-size:11.5px; color:rgba(244,242,234,0.6); line-height:1.35;}
 
   /* ---------- category chip grid ---------- */
   .chip-grid{
+
     display:flex;
     flex-wrap:wrap;
     gap:10px;
@@ -338,7 +388,7 @@
 
   @media (max-width:640px){
     header{padding:20px 16px 14px;}
-    .persona-grid{grid-template-columns:repeat(auto-fill, minmax(150px,1fr));}
+    .persona-card{padding:12px 14px;}
     .logo{font-size:clamp(38px, 14vw, 80px) !important;}
     .eyebrow{font-size:9.5px; margin-bottom:10px;}
     .mode-toggle{margin-top:16px;}
@@ -384,11 +434,14 @@
   </div>
 </header>
 
-<main>
+<main id="mainContent">
 
   <section id="persona-section">
-    <div class="section-label">Who's going?</div>
-    <div class="persona-grid" id="personaGrid"></div>
+    <div class="persona-sidebar">
+      <div class="section-label">Who's going?</div>
+      <button id="personaMapToggle" class="map-toggle-btn">🗺️ Show Map View</button>
+      <div class="persona-list" id="personaGrid"></div>
+    </div>
   </section>
 
   <section id="category-section" style="display:none;">
@@ -401,15 +454,17 @@
     <div class="chip-grid" id="regionChips"></div>
   </section>
 
-  <div class="results-head">
-    <div class="results-title" id="resultsTitle">Everything, everywhere</div>
-    <div class="results-count" id="resultsCount"></div>
-  </div>
-  <div class="card-grid" id="cardGrid"></div>
+  <div class="results-area" id="resultsArea">
+    <div class="results-head">
+      <div class="results-title" id="resultsTitle">Everything, everywhere</div>
+      <div class="results-count" id="resultsCount"></div>
+    </div>
+    <div class="card-grid" id="cardGrid"></div>
 
-  <div id="mapWrap" style="display:none;">
-    <div id="leafletMap"></div>
-    <div class="card-grid" id="placesList"></div>
+    <div id="mapWrap" style="display:none;">
+      <div id="leafletMap"></div>
+      <div class="card-grid" id="placesList"></div>
+    </div>
   </div>
 </main>
 
@@ -664,6 +719,7 @@ let mode = "persona"; // "persona" | "category" | "region"
 let activePersona = null;
 let activeCategory = null;
 let activeRegion = null;
+let showMapView = false; // persona-mode map/list toggle
 
 const catById = id => CATEGORIES.find(c=>c.id===id);
 const regionById = id => REGIONS.find(r=>r.id===id);
@@ -671,8 +727,34 @@ const regionById = id => REGIONS.find(r=>r.id===id);
 const MAP_CATEGORIES = ["coffee","restaurants","experiences"];
 let mapInstance = null;
 
+// Approximate city-centre coordinates, used to place event-type activities on the map
+// (they don't have a precise street address the way coffee/restaurant/experience PLACES do).
+const REGION_COORDS = {
+  "montreal":       [45.5017, -73.5673],
+  "quebec-city":    [46.8139, -71.2080],
+  "ottawa":         [45.4215, -75.6972],
+  "tremblant":      [46.1184, -74.5964],
+  "saint-sauveur":  [45.8797, -74.1673],
+  "magog":          [45.2676, -72.1494],
+  "sherbrooke":     [45.4042, -71.8929],
+  "saint-jean":     [45.3067, -73.2620],
+  "bromont":        [45.3237, -72.6455],
+  "burlington":     [44.4759, -73.2121],
+};
+
+function getCoords(item){
+  if(typeof item.lat === "number" && typeof item.lng === "number") return [item.lat, item.lng];
+  const base = REGION_COORDS[item.region] || REGION_COORDS.montreal;
+  // Deterministic small jitter (based on the name) so multiple pins in the same city fan out a bit
+  let hash = 0;
+  for(let i=0;i<item.name.length;i++){ hash = (hash*31 + item.name.charCodeAt(i)) >>> 0; }
+  const jitterLat = ((hash % 200) - 100) / 4000;
+  const jitterLng = ((Math.floor(hash/200) % 200) - 100) / 4000;
+  return [base[0]+jitterLat, base[1]+jitterLng];
+}
+
 function placeToCard(p){
-  return {name:p.name, cat:p.cat, loc:p.address, desc:`⭐ ${p.rating.toFixed(1)} · ${p.desc}`, url:p.url, region:p.region};
+  return {name:p.name, cat:p.cat, loc:p.address, desc:`⭐ ${p.rating.toFixed(1)} · ${p.desc}`, url:p.url, region:p.region, lat:p.lat, lng:p.lng};
 }
 const ALL_CARDS = ACTIVITIES.concat(PLACES.map(placeToCard));
 
@@ -683,8 +765,10 @@ function renderPersonas(){
     const card = document.createElement("div");
     card.className = "persona-card" + (activePersona===p.id ? " active" : "");
     card.innerHTML = `<span class="persona-emoji">${p.emoji}</span>
-      <div class="persona-name">${p.name}</div>
-      <div class="persona-blurb">${p.blurb}</div>`;
+      <div class="persona-text">
+        <div class="persona-name">${p.name}</div>
+        <div class="persona-blurb">${p.blurb}</div>
+      </div>`;
     card.onclick = ()=>{ activePersona = (activePersona===p.id) ? null : p.id; renderAll(); };
     grid.appendChild(card);
   });
@@ -770,23 +854,67 @@ function renderPlacesMapView(cat){
     });
 }
 
+function renderGenericMapView(list, emptyMsg){
+  const listEl = document.getElementById("placesList");
+  const mapEl = document.getElementById("leafletMap");
+
+  if(mapInstance){ mapInstance.remove(); mapInstance = null; }
+  mapEl.innerHTML = "";
+
+  if(list.length===0){
+    listEl.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
+    return;
+  }
+
+  mapInstance = L.map(mapEl, {scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 18
+  }).addTo(mapInstance);
+
+  const markers = [];
+  list.forEach(item=>{
+    const [lat,lng] = getCoords(item);
+    const c = catById(item.cat);
+    const marker = L.marker([lat, lng]).addTo(mapInstance);
+    marker.bindPopup(`<b>${item.name}</b><br>${c.label}<br>${item.loc}<br><a href="${item.url}" target="_blank" rel="noopener">Visit →</a>`);
+    markers.push(marker);
+  });
+  const group = L.featureGroup(markers);
+  mapInstance.fitBounds(group.getBounds().pad(0.3));
+
+  listEl.innerHTML = "";
+  list.forEach(item=>{
+    const c = catById(item.cat);
+    const card = document.createElement("div");
+    card.className = "activity-card";
+    card.style.setProperty("--card-accent", c.accent);
+    card.innerHTML = `
+      <div class="activity-cat-tag">${c.label}</div>
+      <div class="activity-name">${item.name}</div>
+      <div class="activity-desc">${item.desc}</div>
+      <div class="activity-meta">
+        <span class="activity-loc">${item.loc}</span>
+        <a class="activity-link" href="${item.url}" target="_blank" rel="noopener">Visit site →</a>
+      </div>
+    `;
+    listEl.appendChild(card);
+  });
+}
+
 function renderCards(){
   const grid = document.getElementById("cardGrid");
   const mapWrap = document.getElementById("mapWrap");
   const title = document.getElementById("resultsTitle");
   const count = document.getElementById("resultsCount");
 
+  // Dedicated place-category map (coffee / restaurants / experiences in Category mode)
   if(mode==="category" && activeCategory && MAP_CATEGORIES.includes(activeCategory)){
     grid.style.display = "none";
     mapWrap.style.display = "";
     renderPlacesMapView(activeCategory);
     return;
   }
-  grid.style.display = "";
-  mapWrap.style.display = "none";
-  if(mapInstance){ mapInstance.remove(); mapInstance = null; }
-
-  grid.innerHTML = "";
 
   let list = ALL_CARDS;
   let heading = "Everything, everywhere";
@@ -805,6 +933,20 @@ function renderCards(){
 
   title.textContent = heading;
   count.textContent = `${list.length} experience${list.length===1?"":"s"}`;
+
+  // Persona-mode map toggle: same filtered list, plotted on a map instead of a plain grid
+  if(mode==="persona" && showMapView){
+    grid.style.display = "none";
+    mapWrap.style.display = "";
+    renderGenericMapView(list, "Nothing here yet — pick another persona.");
+    return;
+  }
+
+  grid.style.display = "";
+  mapWrap.style.display = "none";
+  if(mapInstance){ mapInstance.remove(); mapInstance = null; }
+
+  grid.innerHTML = "";
 
   if(list.length===0){
     grid.innerHTML = `<div class="empty-state">Nothing here yet — pick another persona or category.</div>`;
@@ -844,15 +986,29 @@ function setMode(newMode){
   document.getElementById("persona-section").style.display = newMode==="persona" ? "" : "none";
   document.getElementById("category-section").style.display = newMode==="category" ? "" : "none";
   document.getElementById("region-section").style.display = newMode==="region" ? "" : "none";
+  document.getElementById("mainContent").classList.toggle("persona-mode", newMode==="persona");
   if(newMode!=="persona") activePersona = null;
   if(newMode!=="category") activeCategory = null;
   if(newMode!=="region") activeRegion = null;
+  if(newMode!=="persona"){
+    showMapView = false;
+    document.getElementById("personaMapToggle").classList.remove("active");
+    document.getElementById("personaMapToggle").textContent = "🗺️ Show Map View";
+  }
   renderAll();
 }
 
 document.getElementById("btn-persona").onclick = ()=> setMode("persona");
 document.getElementById("btn-category").onclick = ()=> setMode("category");
 document.getElementById("btn-region").onclick = ()=> setMode("region");
+
+document.getElementById("personaMapToggle").onclick = ()=>{
+  showMapView = !showMapView;
+  const btn = document.getElementById("personaMapToggle");
+  btn.classList.toggle("active", showMapView);
+  btn.textContent = showMapView ? "📋 Show List View" : "🗺️ Show Map View";
+  renderCards();
+};
 
 document.getElementById("lastUpdatedText").textContent = LAST_UPDATED;
 
