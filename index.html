@@ -783,7 +783,7 @@ function renderPersonas(){
     card.className = "persona-card" + (activePersona===p.id ? " active" : "");
     card.innerHTML = `<span class="persona-emoji">${p.emoji}</span>
       <div class="persona-name">${p.name}</div>`;
-    card.onclick = ()=>{ activePersona = (activePersona===p.id) ? null : p.id; renderAll(); };
+    card.onclick = ()=>{ activePersona = (activePersona===p.id) ? null : p.id; renderAll(); scrollToResultsOnMobile(); };
     grid.appendChild(card);
   });
 }
@@ -795,7 +795,7 @@ function renderChips(){
     const chip = document.createElement("div");
     chip.className = "chip" + (activeCategory===c.id ? " active" : "");
     chip.textContent = c.label;
-    chip.onclick = ()=>{ activeCategory = (activeCategory===c.id) ? null : c.id; renderAll(); };
+    chip.onclick = ()=>{ activeCategory = (activeCategory===c.id) ? null : c.id; renderAll(); scrollToResultsOnMobile(); };
     wrap.appendChild(chip);
   });
 }
@@ -807,7 +807,7 @@ function renderRegionChips(){
     const chip = document.createElement("div");
     chip.className = "chip" + (activeRegion===r.id ? " active" : "");
     chip.textContent = r.label;
-    chip.onclick = ()=>{ activeRegion = (activeRegion===r.id) ? null : r.id; renderAll(); };
+    chip.onclick = ()=>{ activeRegion = (activeRegion===r.id) ? null : r.id; renderAll(); scrollToResultsOnMobile(); };
     wrap.appendChild(chip);
   });
 }
@@ -985,6 +985,17 @@ function renderCards(){
   });
 }
 
+// On small screens the sidebar (personas/categories/cities) takes the full width and
+// stacks above the results, so after picking a filter nothing on screen visibly changes
+// unless we scroll down for them. Desktop shows sidebar + results side by side already,
+// so this only fires below the same 900px breakpoint used for the layout switch.
+function scrollToResultsOnMobile(){
+  if(window.innerWidth <= 900){
+    const el = document.getElementById("resultsArea");
+    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+
 function renderAll(){
   renderPersonas();
   renderChips();
@@ -1027,6 +1038,7 @@ function wireMapToggle(id){
     btn.classList.toggle("active", showMapView);
     btn.textContent = showMapView ? "📋 Show List View" : "🗺️ Show Map View";
     renderCards();
+    scrollToResultsOnMobile();
   };
 }
 wireMapToggle("personaMapToggle");
