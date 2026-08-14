@@ -1,4 +1,4 @@
-const CACHE_NAME = "sos-ennui-v3";
+const CACHE_NAME = "sos-ennui-v4";
 const PRECACHE_URLS = [
   "./",
   "./index.html",

@@ -413,15 +413,15 @@
 
 <div class="marquee-wrap">
   <div class="marquee">
-    <span class="hot">★ HAPPENING NOW: JUST FOR LAUGHS — THROUGH JULY 26</span>
-    <span>FESTIVAL HAITI EN FEU — PARC LA FONTAINE, JULY 23–27</span>
-    <span class="hot">★ OSHEAGA — AUG 1–2, PARC JEAN-DRAPEAU</span>
-    <span>FIREWORKS: NEXT SHOWS JULY 26 & 30 — LA RONDE</span>
-    <span class="hot">★ MONTGOLFIÈRES SAINT-JEAN-SUR-RICHELIEU — AUG 7–16</span>
-    <span>SALSA TREMBLANT — AUG 21–23</span>
-    <span class="hot">★ FÊTE DES VENDANGES MAGOG-ORFORD — SEPT 5–7</span>
-    <span>GATINEAU HOT AIR BALLOON FESTIVAL — JULY 29–AUG 15</span>
-    <span class="hot">★ SOMMET SAINT-SAUVEUR WATER PARK — OPEN NOW</span>
+    <span class="hot">★ HAPPENING NOW: LASSO MONTRÉAL — AUG 15–16, PARC JEAN-DRAPEAU</span>
+    <span>MONTRÉAL KOREAN FESTIVAL — PEEL BASIN, THIS WEEKEND</span>
+    <span class="hot">★ ITALFESTMTL — LITTLE ITALY, THIS WEEK</span>
+    <span>MONTGOLFIÈRES SAINT-JEAN-SUR-RICHELIEU — FINAL DAYS, CLOSES AUG 16</span>
+    <span class="hot">★ CIRQUE DU SOLEIL: ECHO — LAST CHANCE, CLOSES AUG 16</span>
+    <span>ORIENTALYS FESTIVAL — OLD PORT CLOCK TOWER QUAY, FREE</span>
+    <span class="hot">★ SALSA TREMBLANT — AUG 21–23</span>
+    <span>FÊTE DES VENDANGES MAGOG-ORFORD — SEPT 5–7</span>
+    <span class="hot">★ GRANDE COULÉE BEER FESTIVAL — SEPT 18–20</span>
   </div>
 </div>
 
@@ -483,7 +483,7 @@
 <script>
 /* ---------------- DATA ---------------- */
 
-const LAST_UPDATED = "July 24, 2026";
+const LAST_UPDATED = "August 14, 2026";
 
 const CATEGORIES = [
   {id:"music",       label:"Music, Tributes & Candlelight",      accent:"#f2a53d"},
@@ -547,7 +547,7 @@ const ACTIVITIES = [
   {name:"FILMharmonique: The Legacy of John Williams", cat:"cine", loc:"Salle Wilfrid-Pelletier, Place des Arts", desc:"Four decades of Williams — Jaws to Star Wars to Harry Potter — performed by Canada's premier film-music orchestra.", url:"https://filmharmonique.ca/", region:"montreal"},
 
   // ===== CIRCUS — sourced from tohu.ca, montrealcompletementcirque.com, mtl.org =====
-  {name:"Cirque du Soleil: ECHO", cat:"circus", loc:"Big Top, Old Port of Montréal — May 23–Aug 16", desc:"The record-breaking 2023 hit returns under the big top, after drawing 300,000+ spectators in its Montréal run.", url:"https://www.mtl.org/en/experience/montreal-year-round-circus-hub", region:"montreal"},
+  {name:"Cirque du Soleil: ECHO", cat:"circus", loc:"Big Top, Old Port of Montréal — last days, closes Aug 16", desc:"The record-breaking 2023 hit returns under the big top, after drawing 300,000+ spectators in its Montréal run. Final performances this weekend.", url:"https://www.mtl.org/en/experience/montreal-year-round-circus-hub", region:"montreal"},
   {name:"Montréal Complètement Cirque", cat:"circus", loc:"Citywide — ran July 2–12, 2026; returns each summer", desc:"11 days of circus arts taking over streets, sidewalks and parks — the first North American festival dedicated entirely to circus. This year's edition just wrapped; watch for 2027 dates.", url:"https://montrealcompletementcirque.com/en", region:"montreal"},
   {name:"iD ÉVOLUTION by Cirque Éloize", cat:"circus", loc:"TOHU — Oct 31–Nov 15, 2026", desc:"Trampwall, aerial hoop, trail biking and breakdance collide in an urban-inspired circus creation.", url:"https://tohu.ca/en/season", region:"montreal"},
   {name:"National Circus School Graduating Class Show: Macbeth", cat:"circus", loc:"TOHU — ran May 28–June 7, 2026; new grad show each spring", desc:"The next generation of circus artists stages a circus reinterpretation of Shakespeare's Macbeth. This edition has closed; TOHU stages a new graduating show every spring.", url:"https://tohu.ca/en/season/spectacle-des-finissant-e-s", region:"montreal"},
@@ -555,13 +555,13 @@ const ACTIVITIES = [
 
   // ===== FIREWORKS — sourced from laronde.com / sixflags.com, mtl.org =====
   {name:"40th Anniversary Opening Night", cat:"fireworks", loc:"La Ronde — July 2, 2026, 10pm", desc:"Past-winning pyrotechnic firms join forces to open the 40th edition of L'International des Feux Loto-Québec.", url:"https://en.sixflags.com/laronde/events/linternational-des-feux", region:"montreal"},
-  {name:"International Pyromusical Competition Nights", cat:"fireworks", loc:"La Ronde — remaining 2026 dates: Jul 26 & 30", desc:"Teams from Hungary, Italy, China, Canada, the U.S. and Australia compete with 30-minute music-synced shows, plus a different Quebec artist performing live at 8pm each night.", url:"https://www.sixflags.com/laronde/linternational-des-feux/programmation", region:"montreal"},
+  {name:"International Pyromusical Competition Nights", cat:"fireworks", loc:"La Ronde — 2026 season closed Aug 6; annual each summer", desc:"Teams from Hungary, Italy, China, Canada, the U.S. and Australia competed with 30-minute music-synced shows this year. The full competition runs every summer, roughly July into early August.", url:"https://www.sixflags.com/laronde/linternational-des-feux/programmation", region:"montreal"},
   {name:"Tribute to the Legends — Season Finale", cat:"fireworks", loc:"La Ronde — August 6, 2026", desc:"The closing night of the competition honours past champions of L'International des Feux Loto-Québec.", url:"https://en.sixflags.com/laronde/events/linternational-des-feux", region:"montreal"},
   {name:"Free Viewing from the Jacques-Cartier Bridge", cat:"fireworks", loc:"Pedestrianized on show nights, 8pm–midnight", desc:"The bridge closes to cars on fireworks nights and becomes a free, packed pedestrian promenade for watching the show.", url:"https://www.mtl.org/en/what-to-do/festivals-and-events/l-international-des-feux-loto-quebec", region:"montreal"},
   {name:"Soirées DJ des Feux", cat:"fireworks", loc:"Clock Tower Beach, Old Port", desc:"DJs keep the crowd dancing at the Old Port's Clock Tower Beach while the fireworks light up overhead.", url:"https://www.mtl.org/en/experience/montreal-summer-festival-guide", region:"montreal"},
 
   // ===== MONTGOLFIÈRES — sourced from montgolfieres.com, tourismehautrichelieu.com =====
-  {name:"International Balloon Festival of Saint-Jean-sur-Richelieu", cat:"balloons", loc:"Saint-Jean-sur-Richelieu (~45 min) — Aug 7–9 & 13–16, 2026", desc:"Canada's biggest hot-air balloon gathering: dozens of balloons, rides, camping and a major concert lineup.", url:"https://www.montgolfieres.com/en", region:"saint-jean"},
+  {name:"International Balloon Festival of Saint-Jean-sur-Richelieu", cat:"balloons", loc:"Saint-Jean-sur-Richelieu (~45 min) — wrapping up, closes Aug 16", desc:"Canada's biggest hot-air balloon gathering: dozens of balloons, rides, camping and a major concert lineup. Final two days this weekend.", url:"https://www.montgolfieres.com/en", region:"saint-jean"},
   {name:"Magic Nights", cat:"balloons", loc:"Saint-Jean-sur-Richelieu", desc:"A nighttime field of balloons lit up on the ground like giant glowing lanterns under the stars.", url:"https://www.montgolfieres.com/en", region:"saint-jean"},
   {name:"Festival Concert Stage: The Offspring, Sean Paul, Half Moon Run", cat:"balloons", loc:"Loto-Québec Stage, Saint-Jean-sur-Richelieu", desc:"A full concert lineup runs alongside the balloon launches, including Matt Lang, Kaïn and Fredz.", url:"https://www.montgolfieres.com/en", region:"saint-jean"},
   {name:"Sunrise / Sunset Balloon Flights", cat:"balloons", loc:"Haut-Richelieu region", desc:"Book an actual flight over the Montérégie countryside — the St. Lawrence, the Adirondacks and farmland below.", url:"https://tourismehautrichelieu.com/en/tourism-haut-richelieu/activities/montgolfieres/", region:"saint-jean"},
@@ -627,17 +627,25 @@ const ACTIVITIES = [
   {name:"Kany García & Juanes Concerts", cat:"latin", loc:"MTELUS / Place Bell — via MontrealHispano listings", desc:"The Puerto Rican singer-songwriter and the Colombian rock icon both play Montréal in 2026 — check listings for exact dates.", url:"https://www.montrealhispano.com/eventos-directorio", region:"montreal"},
 
   // ===== COMEDY & MARQUEE FESTIVALS — sourced from montreal.hahaha.com, montrealjazzfest.com, mtl.org =====
-  {name:"Just For Laughs / Juste pour rire", cat:"bigfest", loc:"Quartier des Spectacles — happening now through July 26", desc:"The 44th edition of the world's biggest comedy festival is on right now — free outdoor shows at Place des Festivals plus galas headlined by Weird Al Yankovic and Jerry Seinfeld.", url:"https://montreal.hahaha.com/en", region:"montreal"},
-  {name:"Festival Haiti en Feu (Haiti on Fire)", cat:"bigfest", loc:"Parc La Fontaine — July 23–27, 2026 (happening now)", desc:"Live music, an arts fair and Haitian food fill Parc La Fontaine for the festival's 20th edition — running right now.", url:"https://www.mtl.org/en/experience/things-to-do-july", region:"montreal"},
+  {name:"Just For Laughs / Juste pour rire", cat:"bigfest", loc:"Quartier des Spectacles — ran July 15–26, 2026; annual each July", desc:"The 44th edition of the world's biggest comedy festival — free outdoor shows at Place des Festivals plus galas headlined by Weird Al Yankovic and Jerry Seinfeld. This year's edition has closed.", url:"https://montreal.hahaha.com/en", region:"montreal"},
+  {name:"Festival Haiti en Feu (Haiti on Fire)", cat:"bigfest", loc:"Parc La Fontaine — ran July 23–27, 2026; annual each July", desc:"Live music, an arts fair and Haitian food fill Parc La Fontaine for the festival's 20th edition. This year's run has closed.", url:"https://www.mtl.org/en/experience/things-to-do-july", region:"montreal"},
   {name:"Festival International de Jazz de Montréal", cat:"bigfest", loc:"Quartier des Spectacles — June 25–July 4, 2026", desc:"350+ concerts, two-thirds free — headliners Lionel Richie & Earth, Wind & Fire, and Diana Krall.", url:"https://montrealjazzfest.com/en/program/schedule", region:"montreal"},
   {name:"We Want Miles: A Miles Davis Centennial Celebration", cat:"bigfest", loc:"Maison symphonique — Jazz Fest special event", desc:"Bassist Marcus Miller, Davis's final musical director, leads a tribute marking what would be Miles Davis's 100th birthday.", url:"https://northerntransmissions.com/festival-international-de-jazz-de-montreal-announces-2026-lineup/", region:"montreal"},
-  {name:"Osheaga Music and Arts Festival", cat:"bigfest", loc:"Parc Jean-Drapeau — Aug 1–2, 2026 (coming up)", desc:"Montréal's Coachella-style weekend — six stages, art installations and major international headliners.", url:"https://www.mtl.org/en/experience/montreal-summer-festival-guide", region:"montreal"},
+  {name:"Osheaga Music and Arts Festival", cat:"bigfest", loc:"Parc Jean-Drapeau — ran July 31–Aug 2, 2026; annual each summer", desc:"Montréal's Coachella-style weekend — six stages, art installations and headliners including Tate McRae, Lorde, Major Lazer and Zara Larsson this year. This edition has closed.", url:"https://www.mtl.org/en/experience/montreal-summer-festival-guide", region:"montreal"},
   {name:"Piknic Électronik", cat:"bigfest", loc:"Parc Jean-Drapeau — Sundays, May 17–Oct 18, 2026", desc:"Outdoor Sunday dance parties under Alexander Calder's L'Homme sculpture, with local and international DJs.", url:"https://www.restomontreal.ca/event/piknic-electronik-montreal/5755/en/", region:"montreal"},
+
+  // ===== NEW THIS WEEK (Aug 14–16, 2026) — sourced from mtl.org, todocanada.ca =====
+  {name:"LASSO Montréal", cat:"bigfest", loc:"Parc Jean-Drapeau — Aug 15–16, 2026", desc:"Montréal's premier country music festival — Thomas Rhett, Mumford & Sons, Jon Pardi and more on an island stage overlooking the St. Lawrence, plus a club show at MTELUS.", url:"https://www.mtl.org/en/what-to-do/festivals-and-events/lasso-montreal", region:"montreal"},
+  {name:"Orientalys Festival", cat:"foodfest", loc:"Clock Tower Quay, Old Port — this weekend, free", desc:"A free multi-day festival of Eastern cultures at the Old Port — music, traditional dance, artisan workshops and food from North Africa to East Asia.", url:"https://www.mtl.org/en/what-to-do/festivals-and-events/orientalys-arab-world-festival-of-montreal", region:"montreal"},
+  {name:"ItalfestMTL", cat:"foodfest", loc:"Little Italy & Esplanade Tranquille — this week", desc:"Montréal's citywide celebration of Italian-Québécois heritage — concerts, an outdoor fashion show, opera, open-air cinema and food tastings, drawing roughly half a million visitors annually.", url:"https://www.mtl.org/en/what-to-do/festivals-and-events/italfest-montreal-s-italian-week", region:"montreal"},
+  {name:"Montréal Korean Festival", cat:"foodfest", loc:"Peel Basin (Griffintown) — this weekend", desc:"Québec's premier Korean cultural festival — K-pop and traditional dance, Korean street food, artisan vendors, along the Peel Basin waterfront.", url:"https://www.mkfcmfestival.com/", region:"montreal"},
+  {name:"Grand PoutineFest", cat:"foodfest", loc:"Touring Québec City to Gatineau, 11th edition", desc:"A touring poutine festival hitting its most extensive route yet this year, with 20+ variations to sample at each stop.", url:"https://www.todocanada.ca/whats-week-ottawa/", region:"ottawa"},
+  {name:"Ottawa Greek Festival", cat:"foodfest", loc:"Ottawa, ON — annual each August", desc:"Live Greek music, traditional dance, Greek cuisine, cooking demonstrations and language lessons.", url:"https://www.todocanada.ca/city/ottawa/events/festival-events/", region:"ottawa"},
 
   // ===== OTTAWA-GATINEAU — sourced from ottawatourism.ca, 613today.ca, ottawasbestplaces.com =====
   {name:"RBC Ottawa Bluesfest", cat:"bigfest", loc:"LeBreton Flats, Ottawa (~1.75 hr) — ran July 9–19, 2026; annual each July", desc:"Despite the name it's multi-genre — rock, pop, hip-hop, EDM — with 300,000+ fans over 11 days; ticket includes OC Transpo transit. This year's edition has closed.", url:"https://ottawatourism.ca/en/ottawa-insider/ottawas-summer-music-festivals", region:"ottawa"},
   {name:"Ottawa Jazz Festival", cat:"bigfest", loc:"Confederation Park, Ottawa — ran June 19–28, 2026; annual each June", desc:"The capital's 46th annual jazz, blues and soul festival, with free and ticketed shows across downtown venues. This year's edition has closed.", url:"https://ottawatourism.ca/en/ottawa-insider/ottawas-summer-music-festivals", region:"ottawa"},
-  {name:"Gatineau Hot Air Balloon Festival", cat:"balloons", loc:"Gatineau (~2 hr) — July 29–Aug 15, 2026 (Wed & Sat)", desc:"The Outaouais's largest summer event: morning and afternoon balloon flights, concerts, fireworks and amusement rides.", url:"https://www.projectlocallove.com/blog/ottawa-summer-festivals-events", region:"ottawa"},
+  {name:"Gatineau Hot Air Balloon Festival", cat:"balloons", loc:"Gatineau (~2 hr) — wrapping up, closes Aug 15", desc:"The Outaouais's largest summer event: morning and afternoon balloon flights, concerts, fireworks and amusement rides. Final day tomorrow.", url:"https://www.projectlocallove.com/blog/ottawa-summer-festivals-events", region:"ottawa"},
   {name:"Les Grands Feux du Casino Lac-Leamy", cat:"fireworks", loc:"Casino Lac-Leamy, Gatineau — August, 6 nights", desc:"The 29th edition of this pyromusical fireworks competition, with art installations and roaming performers on the festival grounds.", url:"https://www.projectlocallove.com/blog/ottawa-summer-festivals-events", region:"ottawa"},
   {name:"Latin Sparks Festival", cat:"latin", loc:"Ottawa", desc:"\"Ottawa turns into a night in Havana\" — thousands gather for a night entirely devoted to Latin music and dance.", url:"https://ottawatourism.ca/en/ottawa-insider/ottawas-summer-music-festivals", region:"ottawa"},
   {name:"Ottawa Dragon Boat Festival", cat:"parks", loc:"Mooney's Bay, Ottawa — ran June 19–21, 2026; annual each June", desc:"North America's biggest dragon boat race, free to attend, with a beach, playground and live music alongside the races. This year's race has run; it returns every June.", url:"https://www.613today.ca/things-to-do/summer-festivals-ottawa", region:"ottawa"},
@@ -653,11 +661,11 @@ const ACTIVITIES = [
   // ===== SAINT-SAUVEUR — sourced from sommets.com, valleesaintsauveur.com =====
   {name:"Sommet Saint-Sauveur Water Park", cat:"parks", loc:"Saint-Sauveur (~1 hr) — June 12–Sept 7, 2026", desc:"The largest mountain water park in Quebec — nearly 20 slides, a wave pool and mountain rafting, with a rain-or-money-back guarantee.", url:"https://www.sommets.com/en/what-to-do/water-park/", region:"saint-sauveur"},
   {name:"L'Odyssée du Viking & Parc F.U.N.", cat:"parks", loc:"Saint-Sauveur", desc:"An alpine coaster best ridden at dusk, plus a ground-level amusement park included with water-park tickets.", url:"https://www.sommets.com/en/discover-les-sommets/sommet-saint-sauveur/", region:"saint-sauveur"},
-  {name:"Festival des Arts de Saint-Sauveur (FASS)", cat:"bigfest", loc:"Saint-Sauveur — July 22–Aug 2, 2026", desc:"Intimate live performances staged under the FASS big top in the village.", url:"https://valleesaintsauveur.com/en/events/", region:"saint-sauveur"},
+  {name:"Festival des Arts de Saint-Sauveur (FASS)", cat:"bigfest", loc:"Saint-Sauveur — ran July 22–Aug 2, 2026; annual each summer", desc:"Intimate live performances staged under the FASS big top in the village. This year's run has closed.", url:"https://valleesaintsauveur.com/en/events/", region:"saint-sauveur"},
 
   // ===== MAGOG & EASTERN TOWNSHIPS — sourced from tourisme-memphremagog.com, easterntownships.org =====
   {name:"Fête des Vendanges Magog-Orford", cat:"foodfest", loc:"Magog (~1.5 hr) — Sept 5–7, 2026", desc:"80+ Quebec wineries, microbreweries and distilleries pour tastings lakeside, with cooking workshops and live music.", url:"https://www.easterntownships.org/events/60/fete-des-vendanges-magog-orford", region:"magog"},
-  {name:"Orford Musique Festival", cat:"music", loc:"Mont-Orford Arts Centre — June 10–Aug 15, 2026", desc:"A classical-music festival held on the grounds of the Orford Arts Centre in the middle of Mont-Orford National Park.", url:"https://tourisme-memphremagog.com/en/what-do/events/", region:"magog"},
+  {name:"Orford Musique Festival", cat:"music", loc:"Mont-Orford Arts Centre — wrapping up, closes Aug 15", desc:"A classical-music festival held on the grounds of the Orford Arts Centre in the middle of Mont-Orford National Park. Final concerts tomorrow.", url:"https://tourisme-memphremagog.com/en/what-do/events/", region:"magog"},
   {name:"Grande Coulée Beer Festival", cat:"foodfest", loc:"Magog — Sept 18–20, 2026", desc:"Quebec microbreweries pour tastings with panoramic lake views and local food pairings.", url:"https://tourisme-memphremagog.com/en/what-do/events/", region:"magog"},
   {name:"Cep d'Argent Winery Tour", cat:"foodfest", loc:"Magog", desc:"Guided tours and tastings at one of the Townships' best-known vineyards, overlooking the Magog River.", url:"https://www.expedia.com/Magog.dx8452", region:"magog"},
   {name:"Parc national du Mont-Orford", cat:"parks", loc:"Orford (~1.5 hr)", desc:"Hiking, swimming at Lac Stukely beach, camping and — in winter — skiing and snowshoeing, all inside one provincial park.", url:"https://www.easterntownships.org/towns-and-villages/45075/magog", region:"magog"},
